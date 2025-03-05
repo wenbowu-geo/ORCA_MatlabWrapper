@@ -1,1 +1,1 @@
-ORCA is a acoustic wave package developed by the ocean acoustic community and the group by YT Lin (UCSD) written MATLAB wrapper # ORCA_MatlabWrapper
+ORCA is an acoustic wave package developed by the acoustic community and YT Lin's group (WHOI and UCSD) developed MATLAB wrapper # ORCA_MatlabWrapper
