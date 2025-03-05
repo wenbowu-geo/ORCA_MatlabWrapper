@@ -1,0 +1,49 @@
+2019-07-19
+
+mex binary for the normal mode program ORCA
+
+***********************************************************************************
+
+ORCA normal mode program (contents of /src/):
+	written by Evan Westwood, ARL
+MEX wrapper and matlab function (sub_orca.c, ORCA_MEX.m, ORCA_MEX_example.m):
+	written by Y.-T. Lin, WHOI
+makefile prepared by Brendan DeCourcy, WHOI
+
+***********************************************************************************
+
+/src/ folder contains all necessary source files to compile on a linux system with
+gfortran and a C compiler supported by Matlab. Issue command
+
+>> make -f makefile
+
+in the terminal to compile. Primary output is liborca.a, and sub_orca.mexa64.
+
+- liborca.a: static library compiled with gfortran which contains all object files
+			 needed to run ORCA. Called by mex wrapper sub_orca.c
+- sub_orca.mexa64: mex binary file for Matlab on linux. Called by matlab function
+				   ORCA_MEX.m, example of use provided in ORCA_MEX_example.m
+
+***********************************************************************************
+
+NOTES: 
+
+1) Edit made to fortran source file 'svp_check.f', on line 186:
+flag 'iibad' is now initialized to zero to avoid ORCA issuing 'stop' command
+within Matlab erroneously.
+
+2) Compiling source file 'tools.f' with this makefile issues the Warning that
+on line 104 the REAL(4) variable 'x' is passed to the COMPLEX(4) 'data' argument
+of subroutine 'four1'. This has not been fixed or investigated.
+
+3) Some source files have been edited to declare data types consistent with those
+given in the module source files. Changes here denoted by comment lines in the 
+relevant source files:
+
+	3a) in 'mode_fun.f' file, subroutine 'phi_xlay' is passed the variable 
+        'ikconx' to 'ikcont', which is now declared as complex*16
+	3b) in 'phz_calc.f' file, subroutine 'nzero_lay' is passed the variables
+        'phi_t', 'phi_b', 'dphi_t', 'dphi_b', which are now declared as
+        complex*16 rather than complex*8
+    3c) in 'svp_check.f' file, subroutine 'peak_enter' is passed the variable
+        'jlay', now declared as a real*8

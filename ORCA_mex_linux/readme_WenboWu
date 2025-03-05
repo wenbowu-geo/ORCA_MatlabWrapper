@@ -1,0 +1,59 @@
+Writen by Wenbo Wu at WHOI
+Feb 2025
+
+# ORCA MEX Package on macOS (x86_64)  
+This guide documents the modifications made by Wenbo Wu to run the ORCA MEX package on macOS with MATLAB.
+
+## 1. Fixing a Syntax Error in `sub_orca.c`  
+Modify line 126 in `src_clean/sub_orca.c`:  
+
+Before:  
+if (mex_out_isrun = 0)  
+
+After:  
+if (mex_out_isrun == 0)  
+
+## 2. Handling the `arm64` vs. `x86_64` Issue  
+MATLAB and ORCA must use the same architecture (`arm64` or `x86_64`).  
+
+- Wenbo Wu’s setup: MATLAB is `x86_64`, so `x86_64` gfortran is required.  
+- Installed `x86_64` gfortran using Anaconda under the `x86_env` environment.
+
+## 3. Updating the `Makefile`  
+Modify the MEX compilation rule in the `Makefile` as follows:  
+
+sub_orca.mexa64: sub_orca.c liborca.a  
+    mex FFLAGS='$(FFLAGS) -cpp' -g sub_orca.c liborca.a \  
+    -L/opt/homebrew/anaconda3/envs/x86_env/lib/ \  
+    -lgfortran  
+
+Key Changes:
+- Added `-arch x86_64` to compile for `x86_64`.  
+- Added `-L/opt/homebrew/anaconda3/envs/x86_env/lib/` so MATLAB finds `libgfortran`.  
+
+## 4. Setting Environment Variables  
+Ensure the correct `gfortran` is used by modifying `~/.zshrc` or `~/.bashrc`:  
+
+export PATH=/opt/homebrew/anaconda3/envs/x86_env/bin:$PATH  
+
+Apply the changes:  
+
+source ~/.zshrc  # or source ~/.bashrc  
+
+## 5. Moving the Compiled MEX File  
+After compiling, move the MEX file to the correct directory:  
+
+cp ORCA_mex_linux/src_clean/sub_orca.mexa64 ORCA_mex_linux/  
+
+## 6. Fixing `libgfortran` Path for MATLAB  
+In MATLAB, run the following command to add the `libgfortran` path:  
+
+system('install_name_tool -add_rpath /opt/homebrew/anaconda3/envs/x86_env/lib /Users/wenbowu/Downloads/ORCA_mex_linux/sub_orca.mexmaci64')  
+
+## Final Steps to Run in MATLAB  
+1. Launch MATLAB in `x86_64` mode:  
+   arch -x86_64 matlab  
+2. Run your script in MATLAB and ensure it finds the compiled MEX file.
+
+
+This guide ensures a smooth installation and execution of ORCA MEX on macOS with MATLAB.

@@ -1,0 +1,167 @@
+# Set paths
+EXEPATH = .
+LIBPATH = .
+OBJPATH = ./obj
+MEXLIB = /usr/local/MATLAB/R2017b/extern/include
+
+# Compilation Flags
+FFLAGS = -O2 -fno-underscoring -fPIC -std=legacy -cpp -ffree-line-length-none -arch x86_64
+
+# Object files
+OBJS = airy_hsp.o alloc_vars.o blug.o contour_find.o cub_fit_new.o \
+ cub_root_new.o duct_calcs.o eig_disp.o eig_findm.o em_calc.o ep_calc.o \
+ fix_path.o freq_init.o h_space.o mfun_fill.o mode_branch.o mode_find.o \
+ mode_fun.o opt_read.o phz_calc.o r1r2_calc.o rp_calc.o rp_flay.o \
+ rp_nomm.o rp_nomm0.o rp_sfint.o rp_slay.o rp_slay0.o scairy2.o sr_geom.o \
+ svp_check.o svp_read.o tools.o traj_mag.o vbl_init.o xi_cut_set.o xkh_init.o zmx_init.o
+
+# Module files
+MODS = Parms_com.o gen_com.o i_o_com.o scairy_com.o
+
+# Build MEX file
+sub_orca.mexa64: sub_orca.c liborca.a
+	mex FFLAGS='$(FFLAGS) -cpp' -g sub_orca.c liborca.a \
+    -L/opt/homebrew/anaconda3/envs/x86_env/lib/ \
+    -lgfortran
+
+# Create static library
+liborca.a: ${OBJS} ${MODS} orca_mex.o
+	ar urv ${LIBPATH}/liborca.a orca_mex.o ${OBJS} ${MODS}
+	rm ${OBJS} ${MODS} orca_mex.o \
+           parms_com.mod gen_com.mod i_o_com.mod scairy_com.mod
+
+# Compile modules first
+Parms_com.o: Parms_com.f90
+	arch -x86_64 gfortran -c $(FFLAGS) Parms_com.f90
+
+gen_com.o: Parms_com.o gen_com.f90
+	arch -x86_64 gfortran -c $(FFLAGS) gen_com.f90
+
+i_o_com.o: Parms_com.o i_o_com.f90
+	arch -x86_64 gfortran -c $(FFLAGS) i_o_com.f90
+
+scairy_com.o: scairy_com.f90
+	arch -x86_64 gfortran -c $(FFLAGS) scairy_com.f90
+
+# Compile Fortran source files
+orca_mex.o: Parms_com.o gen_com.o i_o_com.o orca_mex.f90
+	arch -x86_64 gfortran -c $(FFLAGS) orca_mex.f90
+
+airy_hsp.o: Parms_com.o gen_com.o i_o_com.o airy_hsp.f
+	arch -x86_64 gfortran -c $(FFLAGS) airy_hsp.f
+
+alloc_vars.o: Parms_com.o gen_com.o i_o_com.o alloc_vars.f
+	arch -x86_64 gfortran -c $(FFLAGS) alloc_vars.f
+
+blug.o: Parms_com.o blug.f
+	arch -x86_64 gfortran -c $(FFLAGS) blug.f
+
+contour_find.o: Parms_com.o gen_com.o i_o_com.o contour_find.f
+	arch -x86_64 gfortran -c $(FFLAGS) contour_find.f
+
+cub_fit_new.o: cub_fit_new.f
+	arch -x86_64 gfortran -c $(FFLAGS) cub_fit_new.f
+
+cub_root_new.o: cub_root_new.f
+	arch -x86_64 gfortran -c $(FFLAGS) cub_root_new.f
+
+duct_calcs.o: Parms_com.o gen_com.o i_o_com.o duct_calcs.f
+	arch -x86_64 gfortran -c $(FFLAGS) duct_calcs.f
+
+eig_disp.o: eig_disp.f
+	arch -x86_64 gfortran -c $(FFLAGS) eig_disp.f
+
+eig_findm.o: Parms_com.o gen_com.o i_o_com.o eig_findm.f
+	arch -x86_64 gfortran -c $(FFLAGS) eig_findm.f
+
+em_calc.o: scairy_com.o em_calc.f
+	arch -x86_64 gfortran -c $(FFLAGS) em_calc.f
+
+ep_calc.o: scairy_com.o ep_calc.f
+	arch -x86_64 gfortran -c $(FFLAGS) ep_calc.f
+
+fix_path.o: Parms_com.o gen_com.o i_o_com.o fix_path.f
+	arch -x86_64 gfortran -c $(FFLAGS) fix_path.f
+
+freq_init.o: Parms_com.o gen_com.o i_o_com.o freq_init.f
+	arch -x86_64 gfortran -c $(FFLAGS) freq_init.f
+
+h_space.o: scairy_com.o h_space.f
+	arch -x86_64 gfortran -c $(FFLAGS) h_space.f
+
+mfun_fill.o: Parms_com.o gen_com.o i_o_com.o mfun_fill.f
+	arch -x86_64 gfortran -c $(FFLAGS) mfun_fill.f
+
+mode_branch.o: Parms_com.o gen_com.o i_o_com.o mode_branch.f
+	arch -x86_64 gfortran -c $(FFLAGS) mode_branch.f
+
+mode_find.o: Parms_com.o gen_com.o i_o_com.o mode_find.f
+	arch -x86_64 gfortran -c $(FFLAGS) mode_find.f
+
+mode_fun.o: Parms_com.o gen_com.o i_o_com.o mode_fun.f
+	arch -x86_64 gfortran -c $(FFLAGS) mode_fun.f
+
+opt_read.o: Parms_com.o gen_com.o i_o_com.o opt_read.f
+	arch -x86_64 gfortran -c $(FFLAGS) opt_read.f
+
+phz_calc.o: Parms_com.o gen_com.o i_o_com.o phz_calc.f
+	arch -x86_64 gfortran -c $(FFLAGS) phz_calc.f
+
+r1r2_calc.o: Parms_com.o gen_com.o r1r2_calc.f
+	arch -x86_64 gfortran -c $(FFLAGS) r1r2_calc.f
+
+rp_calc.o: Parms_com.o gen_com.o i_o_com.o rp_calc.f
+	arch -x86_64 gfortran -c $(FFLAGS) rp_calc.f
+
+rp_flay.o: rp_flay.f
+	arch -x86_64 gfortran -c $(FFLAGS) rp_flay.f
+
+rp_nomm.o: rp_nomm.f
+	arch -x86_64 gfortran -c $(FFLAGS) rp_nomm.f
+
+rp_nomm0.o: rp_nomm0.f
+	arch -x86_64 gfortran -c $(FFLAGS) rp_nomm0.f
+
+rp_sfint.o: rp_sfint.f
+	arch -x86_64 gfortran -c $(FFLAGS) rp_sfint.f
+
+rp_slay.o: rp_slay.f
+	arch -x86_64 gfortran -c $(FFLAGS) rp_slay.f
+
+rp_slay0.o: rp_slay0.f
+	arch -x86_64 gfortran -c $(FFLAGS) rp_slay0.f
+
+scairy2.o: scairy_com.o scairy2.f
+	arch -x86_64 gfortran -c $(FFLAGS) scairy2.f
+
+sr_geom.o: Parms_com.o gen_com.o i_o_com.o sr_geom.f
+	arch -x86_64 gfortran -c $(FFLAGS) sr_geom.f
+
+svp_check.o: Parms_com.o gen_com.o i_o_com.o svp_check.f
+	arch -x86_64 gfortran -c $(FFLAGS) svp_check.f
+
+svp_read.o: Parms_com.o i_o_com.o svp_read.f
+	arch -x86_64 gfortran -c $(FFLAGS) svp_read.f
+
+tools.o: tools.f
+	arch -x86_64 gfortran -c $(FFLAGS) -ffixed-line-length-0 tools.f
+
+traj_mag.o: Parms_com.o gen_com.o i_o_com.o traj_mag.f
+	arch -x86_64 gfortran -c $(FFLAGS) traj_mag.f
+
+vbl_init.o: scairy_com.o vbl_init.f
+	arch -x86_64 gfortran -c $(FFLAGS) vbl_init.f
+
+xi_cut_set.o: Parms_com.o gen_com.o i_o_com.o xi_cut_set.f
+	arch -x86_64 gfortran -c $(FFLAGS) xi_cut_set.f
+
+xkh_init.o: Parms_com.o gen_com.o i_o_com.o xkh_init.f
+	arch -x86_64 gfortran -c $(FFLAGS) xkh_init.f
+
+zmx_init.o: Parms_com.o gen_com.o i_o_com.o zmx_init.f
+	arch -x86_64 gfortran -c $(FFLAGS) zmx_init.f
+
+# Clean
+clean:
+	rm -f *.o *.mod *.mexa64 liborca.a
+
